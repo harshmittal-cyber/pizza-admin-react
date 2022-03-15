@@ -5,6 +5,8 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     REGISTER_USER_FAIL,
+    CLEAR_ERRORS,
+    LOGOUT_SUCCESS
 } from '../constants/userConstants'
 
 import axios from 'axios';
@@ -57,4 +59,22 @@ export const register = (user) => async (dispatch) => {
     } catch (error) {
         dispatch({ type: REGISTER_USER_FAIL, payload: error.response.data.message })
     }
+}
+
+export const logout = () => async (dispatch) => {
+    const authAxios = axios.create({
+        baseURL: API,
+        headers: {
+            "Content-type": 'application/json',
+        },
+        withCredentials: true
+    });
+
+    await authAxios.get(`/api/admin/logout`);
+
+    dispatch({ type: LOGOUT_SUCCESS })
+}
+
+export const clearerror = () => async (dispatch) => {
+    dispatch({ type: CLEAR_ERRORS })
 }

@@ -5,6 +5,8 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     REGISTER_USER_FAIL,
+    CLEAR_ERRORS,
+    LOGOUT_SUCCESS
 } from '../constants/userConstants';
 
 
@@ -43,6 +45,21 @@ export const userReducer = (state = initialState, action) => {
                 user: null,
                 error: action.payload,
                 loading: false
+            }
+
+        case LOGOUT_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                user: null,
+                isAuthenticated: false,
+            };
+
+
+        case CLEAR_ERRORS:
+            return {
+                ...state,
+                error: null
             }
         default:
             return state
