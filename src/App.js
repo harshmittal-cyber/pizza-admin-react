@@ -4,6 +4,9 @@ import Signup from "./pages/StepAuth/Signup";
 import PrivateRoute from './components/PrivateRoute'
 import HomePage from './pages/HomePage'
 import Dashboard from './Dashboard'
+import Orders from "./pages/Orders";
+import Menu from './pages/menu/Menu';
+import Categories from './pages/menu/Categories'
 
 function App() {
   return (
@@ -15,6 +18,9 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route element={<Dashboard />}>
             <Route exact path='/' element={<HomePage />} />
+            <Route exatc path='/orders' element={<Orders />} />
+            <Route exatc path='/menu' element={<Menu />} />
+            <Route exatc path='/categories' element={<Categories />} />
           </Route>
         </Route>
       </Routes>
