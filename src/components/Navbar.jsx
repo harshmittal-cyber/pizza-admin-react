@@ -10,10 +10,8 @@ const SingleNavItems = [
 const NavItems = [
     {name: "Orders", LinkTo: "/orders", icon: "bi bi-box"},
     {name: "Menu", icon: "bi bi-menu-app", subPages: [
-    {name: "Showcase Items", LinkTo: "/page1"},
-    {name: "Edit Menu", LinkTo: "/page2"},
-    {name: "Edit Categories", LinkTo: "/page3"},
-    {name: "Edit Items", LinkTo: "/page4"},
+    {name: "Menu", LinkTo: "/menu"},
+    {name: "Categories", LinkTo: "/categories"},
     ]},
     {name: "Reviews", LinkTo: "/reviews", icon: "bi bi-chat-left-quote", subPages: [
         {name: "View All Reviews", LinkTo: "/reviews"},

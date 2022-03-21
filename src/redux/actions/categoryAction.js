@@ -4,8 +4,9 @@ import {
     CATEGORY_CREATE_SUCCESS
 } from '../constants/categoryConstants';
 import { API } from '../../Backend'
+import axios from 'axios'
 
-export const createcategory = ({ storeId, name }) => async (dispatch) => {
+export const createCategory = (userId, name) => async (dispatch) => {
     try {
         dispatch({ type: CATEGORY_CREATE_REQUEST })
 
@@ -18,8 +19,8 @@ export const createcategory = ({ storeId, name }) => async (dispatch) => {
         });
 
         const { data } = await authAxios.post(
-            `/api/category/create/${storeId}`,
-            name,
+            `/api/category/create/${userId}`,
+            { name: name },
         );
         console.log(data)
         dispatch({ type: CATEGORY_CREATE_SUCCESS, payload: data });
