@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux';
-import { createCategory } from '../../redux/actions/categoryAction';
+import { createCategory,getCategories } from '../../redux/actions/categoryAction';
 
 const Categories = () => {
   const dispatch=useDispatch();
@@ -9,6 +9,13 @@ const Categories = () => {
   const {user}=useSelector((state)=>state.userReducer)
   const {categories}=useSelector((state)=>state.categoryReducer)
   
+  useEffect(()=>{
+    if(categories.length===0){
+      const userId=user._id
+      dispatch(getCategories({userId}))
+    }
+  },[])
+
   const handleChange = (e) =>{
     setError(null)
     setCategory(e.target.value)
