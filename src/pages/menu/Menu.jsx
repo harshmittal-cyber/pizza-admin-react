@@ -1,19 +1,32 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux';
 import { Link } from 'react-router-dom';
+import { getCategories } from '../../redux/actions/categoryAction';
+import {deleteItem } from '../../redux/actions/itemAction';
 
 const Menu = () => {
   const dispatch=useDispatch();
   const {categories}=useSelector((state)=>state.categoryReducer)
-  
+  const {user}=useSelector((state)=>state.userReducer)
   const handleCategoryChange = (category) =>{
 
 
     console.log(category)
   }
 
+  useEffect(()=>{
+    if(categories.length===0){
+      const userId=user._id
+      dispatch(getCategories({userId}))
+    }
+  },[])
+
   const handleCategoryDelete = (category) =>{
     console.log(category)
+  }
+
+  const handleItemDelete=(itemId)=>{
+    dispatch(deleteItem(itemId))
   }
 
   return (
@@ -33,7 +46,7 @@ const Menu = () => {
               Edit Name
             </button>
             
-            <Link to='/additem'>
+            <Link to='/additem' state={{categoryId:category._id}}>
               <span className="dropdown-item cursor-pointer text-primary-hover">Add new item</span>
             </Link>
             
@@ -62,11 +75,11 @@ const Menu = () => {
               <td><img className='shadow' src={item.image}
                   style={{objectFit: "cover", objectPosition: "center", borderRadius: "8px", height: "50px", width: "50px"}}
                   alt="" /></td>
-              <td>{item.name}</td>
-              <td>{item.price}Rs</td>
+              <td>{item.itemName}</td>
+              <td>Rs {item.price}</td>
               {item.isVeg ? <td><span class="badge badge-lg badge-dot"><i class="bg-success"></i>Veg</span></td> : <td>
                 <span class="badge badge-lg badge-dot"><i class="bg-danger"></i>Non Veg</span></td>}
-              {item.isAvailable ? <td><span
+              {item.inStock ? <td><span
                   className='bg-soft-success text-success rounded-pill badge badge-sm fw-normal'>Available</span></td> :
               <td><span className='bg-soft-danger text-danger rounded-pill badge badge-sm fw-normal'>Not Available</span>
               </td>}
@@ -74,7 +87,7 @@ const Menu = () => {
               <td>
                 <button className='btn btn-neutral btn-sm me-3'>Unavailable</button>
                 <button className='btn btn-neutral btn-sm me-3'><i className='bi bi-pencil'></i></button>
-                <button className='btn btn-neutral btn-sm'><i className='bi bi-trash'></i></button>
+                <button className='btn btn-neutral btn-sm' onClick={()=>handleItemDelete(item._id)}><i className='bi bi-trash'></i></button>
               </td>
             </tr>
             ))}

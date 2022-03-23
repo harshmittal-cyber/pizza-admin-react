@@ -6,7 +6,8 @@ import HomePage from './pages/HomePage'
 import Dashboard from './Dashboard'
 import Orders from "./pages/Orders";
 import Menu from './pages/menu/Menu';
-import Categories from './pages/menu/Categories'
+import Categories from './pages/menu/Categories';
+import AddItem from "./pages/menu/AddItem";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route exatc path='/orders' element={<Orders />} />
             <Route exatc path='/menu' element={<Menu />} />
             <Route exatc path='/categories' element={<Categories />} />
+            <Route exact path='/additem' element={<AddItem />} />
           </Route>
         </Route>
       </Routes>
