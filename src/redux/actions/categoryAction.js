@@ -57,6 +57,7 @@ export const createCategory = (userId, name) => async (dispatch) => {
 
 export const deleteCategory = (categoryId) => async (dispatch) => {
     try {
+        console.log(categoryId)
         dispatch({ type: DELETE_CATEGORY_REQUEST });
 
         const authAxios = axios.create({
@@ -67,10 +68,11 @@ export const deleteCategory = (categoryId) => async (dispatch) => {
             withCredentials: true
         });
 
-        const { data } = await authAxios.post(
+        const { data } = await authAxios.delete(
             `/api/category/delete/${categoryId}`
         );
-        console.log(data)
+        console.log(data);
+        dispatch({ type: DELETE_CATEGORY_SUCCESS, payload: data })
 
     } catch (error) {
         dispatch({ type: DELETE_CATEGORY_FAIL, payload: error.response.data.message })

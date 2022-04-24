@@ -30,8 +30,10 @@ export const login = (user) => async (dispatch) => {
         );
         console.log(data)
         dispatch({ type: LOGIN_SUCCESS, payload: data });
+        return data
     } catch (error) {
         dispatch({ type: LOGIN_FAIL, payload: error.response.data.message });
+        return error.response.data;
     }
 };
 
@@ -52,12 +54,14 @@ export const register = (user) => async (dispatch) => {
             `/api/admin/signup`,
             user,
         );
+
         console.log(data)
         dispatch({ type: REGISTER_USER_SUCCESS, payload: data });
 
-
+        return data
     } catch (error) {
-        dispatch({ type: REGISTER_USER_FAIL, payload: error.response.data.message })
+        dispatch({ type: REGISTER_USER_FAIL, payload: error.response.data.message });
+        return error.response.data
     }
 }
 

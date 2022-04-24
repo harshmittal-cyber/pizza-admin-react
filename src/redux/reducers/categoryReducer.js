@@ -13,7 +13,10 @@ import {
     DELETE_ITEM_SUCCESS,
     UPDATE_ITEM_REQUEST,
     UPDATE_ITEM_FAIL,
-    UPDATE_ITEM_SUCCESS
+    UPDATE_ITEM_SUCCESS,
+    DELETE_CATEGORY_REQUEST,
+    DELETE_CATEGORY_FAIL,
+    DELETE_CATEGORY_SUCCESS
 } from '../constants/categoryConstants'
 
 const initialState = {
@@ -21,7 +24,8 @@ const initialState = {
     categories: [],
     isDeleted: false,
     error: null,
-    success: false
+    success: false,
+    message: null
 }
 
 
@@ -32,6 +36,7 @@ export const categoryReducer = (state = initialState, action) => {
         case GET_CATEGORIES_REQUEST:
         case DELETE_ITEM_REQUEST:
         case UPDATE_ITEM_REQUEST:
+        case DELETE_CATEGORY_REQUEST:
             return {
                 ...state,
                 loading: true,
@@ -100,11 +105,22 @@ export const categoryReducer = (state = initialState, action) => {
                 success: true
             }
 
+        case DELETE_CATEGORY_SUCCESS:
+            return {
+                ...state,
+                categories: state.categories.filter((cate) => cate._id !== action.payload._id),
+                loading: false,
+                success: true,
+                error: null,
+                message: action.payload.message
+            }
+
         case CATEGORY_CREATE_FAIL:
         case ITEM_CREATE_FAIL:
         case GET_CATEGORIES_FAIL:
         case DELETE_ITEM_FAIL:
         case UPDATE_ITEM_FAIL:
+        case DELETE_CATEGORY_FAIL:
             return {
                 ...state,
                 error: action.payload,
