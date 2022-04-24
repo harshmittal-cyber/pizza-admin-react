@@ -1,7 +1,7 @@
 import React,{useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getCategories } from '../../redux/actions/categoryAction';
+import { deleteCategory, getCategories } from '../../redux/actions/categoryAction';
 import {deleteItem } from '../../redux/actions/itemAction';
 
 const Menu = () => {
@@ -22,7 +22,8 @@ const Menu = () => {
   },[])
 
   const handleCategoryDelete = (category) =>{
-    console.log(category)
+    console.log(category);
+    dispatch(deleteCategory(category._id))
   }
 
   const handleItemDelete=(itemId)=>{

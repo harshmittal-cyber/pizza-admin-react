@@ -9,24 +9,69 @@ const Login = () => {
     const {loading,error,isAuthenticated}=useSelector((state)=>state.userReducer)
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
-    const [loginerror,setLoginError]=useState()
+    const [loginDetails,setLoginDetails]=useState({email:'',password:''})
+    const [loginerror,setLoginError]=useState("");
+    const [errorMessage,setErrorMessage]=useState("")
+    let loginInitialState={
+        emailError:"",
+        passwordError:"",
+    }
+    const [authError,setAuthError]=useState(loginInitialState);
+    const [displayError,setDisplayError]=useState(false)
     const dispatch=useDispatch();
     const navigate=useNavigate()
 
+    const handleChange=(e)=>{
+        setLoginDetails((prevState)=>({
+            ...prevState,
+            [e.target.name]:e.target.value
+        }))
+    }
+
+    const loginValidate=()=>{
+        let emailError=""
+        let passwordError=""
+        if(loginDetails.email.trim().length===0){
+            emailError="Email is required"
+        }
+        if(loginDetails.password.trim().length===0){
+            passwordError="Password is required"
+        }
+        if(emailError||passwordError){
+            setAuthError({emailError,passwordError})
+            return false
+        }
+        return true
+    }
     const submit=()=>{
-        dispatch(login({email,password}))
+        if(loginValidate()){
+            dispatch(login(loginDetails))
+            .then((res)=>{
+                console.log('jhghbjkl',res)
+                if(!res.success){
+                    displayErrorFunction(res.message);
+                }
+            })
+        }else{
+            displayErrorFunction("")
+        }
+    }
+
+    const displayErrorFunction=(message)=>{
+        setErrorMessage(message);
+        setDisplayError(true)
+        setTimeout(()=>{
+            setAuthError(loginInitialState);
+            setErrorMessage("");
+            setDisplayError(false)
+        },3000)
     }
 
     useEffect(()=>{
-        setTimeout(()=>{
-            setLoginError('')
-            if(error) dispatch(clearerror())
-        },3000)
-
         if(isAuthenticated){
             navigate('/')
         }
-    },[error,loginerror,isAuthenticated])
+    },[isAuthenticated])
 
     return (
         <div>
@@ -34,7 +79,7 @@ const Login = () => {
             <div className="d-flex justify-content-center">
                 <div
                     className="col-lg-5 col-xl-4 p-12 p-xl-20 position-fixed start-0 top-0 h-screen overflow-y-hidden bg-primary d-none d-lg-flex flex-column">
-                    <a className="d-block" href="#"><img src="https://clever-dashboard.webpixels.work/img/logos/clever-light.svg" className="h-10" alt="..." /></a>
+                    {/* <a className="d-block" href="#"><img src="https://clever-dashboard.webpixels.work/img/logos/clever-light.svg" className="h-10" alt="..." /></a> */}
                     <div className="mt-32 mb-20">
                         <h1 className="ls-tight font-bolder display-6 text-white mb-5">Let’s build something amazing today.</h1>
                         <p className="text-white text-opacity-80">Maybe some text here will help me see it better. Oh God. Oke,
@@ -51,10 +96,12 @@ const Login = () => {
                             <div className="col-lg-10 col-md-9 col-xl-6 mx-auto ms-xl-0">
                                 <div className="mt-15 mt-lg-5 mb-6 d-lg-block">
                                     <h1 className="ls-tight font-bolder h2">Nice to see you!</h1>
-                                    <span className='text-danger mt-2'>{error}</span>
+                                    {!displayError ? <></> : <span className='text-danger mt-2'>{errorMessage}</span>}
                                 </div>
                                     <div className="mb-5"><label className="form-label" htmlFor="email">Email</label> <input
-                                            className="form-control" autoComplete="off" type="text" name="username" onChange={(e)=>setEmail(e.target.value)} /></div>
+                                            className="form-control" autoComplete="off" type="text" name="email" onChange={handleChange} />
+                                               <span className='text-danger'>{authError.emailError}</span>
+                                            </div>
                                     <div className="mb-5">
                                         <div className="d-flex align-items-center justify-content-between">
                                             <div><label className="form-label" htmlFor="password">Password</label></div>
@@ -62,18 +109,14 @@ const Login = () => {
                                                     className="text-sm text-muted text-primary-hover text-underline">Forgot
                                                     password?</Link></div>
                                         </div><input className="form-control" type="password"
-                                    name="password" onChange={(e)=>setPassword(e.target.value)}
+                                    name="password" onChange={handleChange} 
                                             />
+                                    <span className='text-danger'>{authError.passwordError}</span>
                                     </div>
                                     {/* <div><span className='text-danger'>{error}</span></div> */}
-                                    <div className="mb-5">
-                                        <div className="form-check"><input className="form-check-input" type="checkbox"
-                                                name="check_example" id="check_example" /> <label className="form-check-label"
-                                                htmlFor="check_example">Keep me logged in</label></div>
-                                    </div>
                                    
                                     <div>
-                                        <button onClick={submit} disabled={email.length<1 || password.length<1} className="btn btn-primary w-full">
+                                        <button onClick={submit} className="btn btn-primary w-full">
                                             Sign in
                                         </button>
                                     </div>
