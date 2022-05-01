@@ -81,7 +81,7 @@ const Login = () => {
                     className="col-lg-5 col-xl-4 p-12 p-xl-20 position-fixed start-0 top-0 h-screen overflow-y-hidden bg-primary d-none d-lg-flex flex-column">
                     {/* <a className="d-block" href="#"><img src="https://clever-dashboard.webpixels.work/img/logos/clever-light.svg" className="h-10" alt="..." /></a> */}
                     <div className="mt-32 mb-20">
-                        <h1 className="ls-tight font-bolder display-6 text-white mb-5">Let’s build something amazing today.</h1>
+                        <h1 className="ls-tight font-bolder display-6 text-white mb-5">Let’s Eat something amazing today.</h1>
                         <p className="text-white text-opacity-80">Maybe some text here will help me see it better. Oh God. Oke,
                             let’s do it then.</p>
                     </div>
