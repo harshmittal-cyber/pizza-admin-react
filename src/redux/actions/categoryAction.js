@@ -48,10 +48,12 @@ export const createCategory = (userId, name) => async (dispatch) => {
             `/api/category/create/${userId}`,
             { name: name },
         );
-        console.log(data)
+
         dispatch({ type: CATEGORY_CREATE_SUCCESS, payload: data });
+        return data
     } catch (error) {
         dispatch({ type: CATEGORY_CREATE_FAIL, payload: error.response.data.message })
+        return error.response.data
     }
 }
 

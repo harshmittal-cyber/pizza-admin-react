@@ -22,7 +22,6 @@ import {
 const initialState = {
     loading: false,
     categories: [],
-    isDeleted: false,
     error: null,
     success: false,
     message: null
@@ -40,6 +39,8 @@ export const categoryReducer = (state = initialState, action) => {
             return {
                 ...state,
                 loading: true,
+                message: null,
+                success: false,
             }
 
         case CATEGORY_CREATE_SUCCESS:
@@ -47,7 +48,18 @@ export const categoryReducer = (state = initialState, action) => {
                 ...state,
                 categories: [...state.categories, action.payload.category],
                 loading: false,
-                success: true
+                success: true,
+                message: action.payload.message
+            }
+
+        case DELETE_CATEGORY_SUCCESS:
+            return {
+                ...state,
+                categories: state.categories.filter((cate) => cate._id !== action.payload._id),
+                loading: false,
+                success: true,
+                error: null,
+                message: action.payload.message
             }
 
         case GET_CATEGORIES_SUCCESS:
@@ -105,15 +117,7 @@ export const categoryReducer = (state = initialState, action) => {
                 success: true
             }
 
-        case DELETE_CATEGORY_SUCCESS:
-            return {
-                ...state,
-                categories: state.categories.filter((cate) => cate._id !== action.payload._id),
-                loading: false,
-                success: true,
-                error: null,
-                message: action.payload.message
-            }
+
 
         case CATEGORY_CREATE_FAIL:
         case ITEM_CREATE_FAIL:
@@ -124,7 +128,8 @@ export const categoryReducer = (state = initialState, action) => {
             return {
                 ...state,
                 error: action.payload,
-                loading: false
+                loading: false,
+                success: false
             }
         default:
             return state
