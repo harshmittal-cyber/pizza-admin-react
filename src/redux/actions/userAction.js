@@ -6,11 +6,13 @@ import {
     REGISTER_USER_SUCCESS,
     REGISTER_USER_FAIL,
     CLEAR_ERRORS,
-    LOGOUT_SUCCESS
+    LOGOUT_SUCCESS,
+    RESET
 } from '../constants/userConstants'
 
 import axios from 'axios';
 import { API } from '../../Backend'
+import { persistor } from '../store'
 
 export const login = (user) => async (dispatch) => {
     try {
@@ -66,6 +68,9 @@ export const register = (user) => async (dispatch) => {
 }
 
 export const logout = () => async (dispatch) => {
+    localStorage.clear();
+    await persistor.purge();
+    dispatch({ type: RESET })
     const authAxios = axios.create({
         baseURL: API,
         headers: {

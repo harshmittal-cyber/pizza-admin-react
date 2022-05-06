@@ -1,21 +1,26 @@
 import React,{useEffect,useState} from 'react'
 import {useSelector, useDispatch} from 'react-redux';
 import { Link } from 'react-router-dom';
-import { deleteCategory, getCategories,createCategory } from '../../redux/actions/categoryAction';
-import {deleteItem } from '../../redux/actions/itemAction';
+import { deleteCategory, getCategories,createCategory ,updateCategory,selectedCategory} from '../../redux/actions/categoryAction';
+import {deleteItem ,createItem} from '../../redux/actions/itemAction';
 import Toaster from '../../utility/Toaster';
 import Modal from '../../utility/Modal';
 import TagsInput from './TagsInput'
 
 const Menu = () => {
   const dispatch=useDispatch();
-  const {categories,message,error,loading}=useSelector((state)=>state.categoryReducer)
+  const {categories,message,error,loading,selectedcategory}=useSelector((state)=>state.categoryReducer)
   const {user}=useSelector((state)=>state.userReducer);
   const [category,setCategory]=useState('');
   const [redirect,setRedirect]=useState(false);
-  const [toaster,setToaster]=useState(false)
+  const [toaster,setToaster]=useState(false);
+  const [inputs,setInputs]=useState({itemName:'',description:'',price:'',tags:[]})
+  const [resetTags,setResetTags]=useState(false);
+  const [checked,setChecked]=useState(false);
+  const [categoryId,setCategoryId]=useState(categories.length!==0 && categories[0]._id)
   
-
+  // edit category
+  const [editCategory,setEditCategory]=useState({name:''});
   useEffect(()=>{
     if(categories.length===0){
       const userId=user._id
@@ -26,6 +31,11 @@ const Menu = () => {
   //category changes
   const handleCategoryChange = (e) =>{
     setCategory(e.target.value)
+  }
+
+  const handleCategoryValue = (e, category) => {
+    dispatch(selectedCategory(JSON.parse(category)))
+    setCategoryId(category._id);
   }
 
   const handleCategorySubmit =async (e,isRedirect) =>{
@@ -59,18 +69,118 @@ const Menu = () => {
     dispatch(deleteCategory(category._id))
   }
 
+  // catgeory update
+  const handleCategoryUpdateChange=(e)=>{
+    setEditCategory(prev=>{
+      return {
+        ...prev,
+        [e.target.name]:e.target.value
+      }
+    })
+  }
+
+  const handleCategoryUpdate=async ()=>{
+    if(editCategory.name.trim().length<1){
+      displayErrorFunction("Plese Enter a Category Name")
+    }else{
+      let filterCategory =await categories.filter(cate =>(cate._id!==editCategory._id) && (cate.name.trim().toLowerCase() === editCategory.name.trim().toLowerCase()));
+      
+      if(filterCategory.length<1){
+        dispatch(updateCategory(user._id, editCategory))
+        .then(res=>{
+          if(res.success){
+            setToaster(true)
+            closeUpdateCategoryModal();
+            setEditCategory({name:''})
+          }
+        })
+      }else{
+        displayErrorFunction('Category Already Exist')
+      }
+    }
+  }
+
+  const updateCategoryModalHandler=(category)=>{
+    document.getElementById("updatecategoryname").click();
+    setEditCategory({
+      ...category,
+      name:category.name
+    })
+  }
+
+
+  // item functions
+  const handleAddItemChange=(e)=>{
+    if (e.target.name === 'isNonVeg') {
+        e.target.value = e.target.checked
+        setChecked(!checked)
+    }
+    setInputs((prev)=>{
+      return {
+        ...prev,
+        [e.target.name]:e.target.value
+      }
+    })
+  }
+
+  const tagHandler=(tags)=>{
+    setInputs(prev=>{
+      return {
+        ...prev,
+        tags:tags
+      }
+    })
+    setResetTags(false)
+  }
+
+  const handleAddItem=async (e,isMore)=>{
+    e.preventDefault()
+  
+    let category=Object.keys(selectedcategory).length!==0?selectedcategory._id:categoryId
+    let newItem={...inputs,categoryId:category};
+
+
+   dispatch(createItem(user._id,newItem)).then((res)=>{
+     console.log('res',res)
+      if(res.success){
+        setToaster(true)
+        setInputs({itemName:'',description:'',price:'',tags:[]})
+        setChecked(false)
+        setResetTags(true)
+        closeItemModal()
+        if(isMore){
+          addItemModalHandler()
+        }
+      }
+   })
+  }
+
+
   const handleItemDelete=(itemId)=>{
     dispatch(deleteItem(itemId))
   }
 
   // modals
   const addItemModalHandler = () => {   
+    if(categories.length>0){
+      dispatch(selectedCategory(categories[0]))
       document.getElementById("additemmodalbutton").click()
+    }
+  }
+
+  //close and open add item modal
+  const closeItemModal=()=>{
+    document.getElementById("closeadditemmodal").click();
   }
 
   //close and open modal
   const closeCategoryModal = () => {
     let closeModalButton = document.getElementById("closecategorymodal")
+    closeModalButton.click()
+  }
+
+  const closeUpdateCategoryModal=()=>{
+    let closeModalButton = document.getElementById("closeupdatecategorymodal")
     closeModalButton.click()
   }
 
@@ -95,7 +205,7 @@ const Menu = () => {
 
       <Modal targetName={'categoryModal'}>
       <div className='p-lg-5 p-1 text-center'>
-          <h1>Add Categroy</h1>
+          <h1>Add Category</h1>
           <p>Make the most out of your new category by adding items to it. Categories with no item will not be displayed</p>
           <form id='category-form' onSubmit={(e)=>handleCategorySubmit(e)}  autoComplete='off'>
               {/* CategoryName */}
@@ -125,6 +235,7 @@ const Menu = () => {
       <button className='d-none' data-bs-dismiss="modal" id="closecategorymodal">Close any modal</button>
       </Modal>
 
+    {/* add item modal */}
       <Modal targetName={'additemmodal'}>
         <div className='p-5 text-center'>
           <h1 className='pb-5'>Add Item</h1>
@@ -132,7 +243,8 @@ const Menu = () => {
           <div className='mt-5'>
               <label htmlFor="categoryId" className='w-100 text-start'>Select Category</label>
               <select className='form-select text-capitalize' name="categoryId" 
-               id="" style={{backgroundColor:"#EDF2F7"}}>
+              value={Object.keys(selectedcategory).length>1?JSON.stringify(selectedcategory): categories.length!==0? JSON.stringify(categories[0]) : JSON.stringify({})}
+              onChange={(e) => handleCategoryValue(e, e.target.value)}  id="" style={{backgroundColor:"#EDF2F7"}}>
                 {
                   categories.map((cate,index)=>(
                     <option key={index} value={JSON.stringify(cate)}>{cate.name}</option>
@@ -145,37 +257,86 @@ const Menu = () => {
               <input className='form-control' type="text" name="itemName" id="" 
                 onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
                 placeholder='Enter Item Name' style={{backgroundColor:"#EDF2F7"}}
+                value={inputs.itemName} onChange={handleAddItemChange} 
               />
               {/* <span className='text-danger'>{addItemError.itemNameError}</span> */}
             </div>
             <div className='mt-5'>
-              <label htmlFor="itemName" className='w-100 text-start'>Item Description</label>
+              <label htmlFor="description" className='w-100 text-start'>Item Description</label>
               <input className='form-control' type="text" 
               onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()} 
-              name="description" id="" placeholder='Enter Item Description' style={{backgroundColor:"#EDF2F7"}} 
+              name="description" id="description" placeholder='Enter Item Description' style={{backgroundColor:"#EDF2F7"}} 
+              value={inputs.description} onChange={handleAddItemChange} 
                />
             </div>
             <div className='mt-5'>
-              <label htmlFor="itemName" className='w-100 text-start'>Item Price</label>
+              <label htmlFor="price" className='w-100 text-start'>Item Price</label>
               <input className='form-control' type="text" name="price" 
-              id="" placeholder='Enter Item Price' style={{backgroundColor:"#EDF2F7"}}
+              id="price" placeholder='Enter Item Price' style={{backgroundColor:"#EDF2F7"}}
+              value={inputs.price} onChange={handleAddItemChange} 
               />
             </div>
             <div className='mt-5'>
               <label htmlFor="tags" className='w-100 text-start'>Tags</label>
-              {/* <TagsInput/>               */}
+              <TagsInput onChange={tagHandler} resetTags={resetTags} defaultTags={[...inputs.tags]}/>              
             </div>
             <div className='mt-5 d-flex align-items-center justify-content-between'>
                 <p className="mb-0">Mark as Non - Veg</p>
                 <div className="form-check form-switch">
 								<input className="form-check-input" type="checkbox" name="isNonVeg"
+                onChange={handleAddItemChange}
+                checked={checked}
               />
 							</div>
             </div>
+            <div className="row mt-5">
+                <div className='col-6'>
+                  <button className='btn btn-outline-primary w-100' onClick={(e)=>handleAddItem(e,false)}>
+                    <span >Save</span>
+                  </button>
+                </div>
+                <div className='col-6'>
+                  <button className='btn btn-primary w-100' onClick={(e)=>handleAddItem(e,true)}>
+                    <span>Add more</span>
+                  </button>
+                </div>
+              </div>
           </form>
         </div>
-
+        <button className='d-none' data-bs-dismiss="modal" id="closeadditemmodal">Close any modal</button>
       </Modal>
+
+      {/* update category Modal */}
+      <Modal targetName={'updateCategoryName'}>
+        <div className='p-lg-5 p-1 text-center'>
+            <h1>Edit Name</h1>
+            <p>Make the most out of your new category by adding items to it. Categories with no item will not be displayed</p>
+
+                {/* CategoryName */}
+                <div className="mt-5 pt-5">
+                  <label htmlFor="categoryname" className='w-100 text-start'>New Category Name</label>
+                  <input type="text"  className='form-control' placeholder='Enter Name'
+                      style={{backgroundColor:"#EDF2F7"}} name="name" autoComplete="off" 
+                      value={editCategory.name} onChange={handleCategoryUpdateChange}
+                    />
+                </div>
+                
+                <div className="row">
+                  <div className="col-md-6 col-sm-12 mt-4 pt-5">
+                    <button className='btn btn-outline-primary w-100' data-bs-dismiss="modal">
+                              Cancel
+                    </button>
+                  </div>
+                  <div className="col-md-6 col-sm-12 mt-4 pt-0 pt-md-5">
+                    <button className='btn btn-primary w-100' onClick={handleCategoryUpdate}>
+                        <span>Save</span>
+                    </button>
+                  </div>
+                </div>
+          </div>
+          <button className='d-none' data-bs-dismiss="modal" id="closeupdatecategorymodal">Close any modal</button>      
+        </Modal>
+
     {categories.map((category, index)=>(
     <div key={index} className="card mt-5 px-0" id={category.id}>
       <div className="card-header border-bottom d-flex align-items-center">
@@ -186,7 +347,7 @@ const Menu = () => {
           </span>
           <div className="dropdown-menu">
             
-            <button className="dropdown-item cursor-pointer text-primary-hover">
+            <button className="dropdown-item cursor-pointer text-primary-hover" onClick={()=>updateCategoryModalHandler(category)}>
               Edit Name
             </button>
             
@@ -221,7 +382,7 @@ const Menu = () => {
                   alt="" /></td>
               <td>{item.itemName}</td>
               <td>Rs {item.price}</td>
-              {item.isNonVeg ? <td><span class="badge badge-lg badge-dot"><i class="bg-success"></i>Veg</span></td> : <td>
+              {!item.isNonVeg ? <td><span class="badge badge-lg badge-dot"><i class="bg-success"></i>Veg</span></td> : <td>
                 <span class="badge badge-lg badge-dot"><i class="bg-danger"></i>Non Veg</span></td>}
               {item.inStock ? <td><span
                   className='bg-soft-success text-success rounded-pill badge badge-sm fw-normal'>Available</span></td> :
@@ -241,8 +402,8 @@ const Menu = () => {
     </div>
     ))}
 
-{toaster && message && <Toaster text={message} icon={'tick'} showIcon={true} />}
-{toaster && error && <Toaster text={error} icon={'x'} showIcon={true} />}
+  {toaster && message && <Toaster text={message} icon={'tick'} showIcon={true} />}
+  {toaster && error && <Toaster text={error} icon={'x'} showIcon={true} />}
   {/* utility buttons for opening and closing of modals dynimically */}
   <button className='d-none' data-bs-toggle="modal" data-bs-target="#additemmodal" id='additemmodalbutton'>Open Add item modal</button>
     <button className='d-none' data-bs-toggle="modal" data-bs-target="#editItemModal" id='edititemmodalbutton'>Open Edit item modal</button>
