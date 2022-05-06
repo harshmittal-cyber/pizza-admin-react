@@ -7,7 +7,11 @@ import {
     GET_CATEGORIES_SUCCESS,
     DELETE_CATEGORY_FAIL,
     DELETE_CATEGORY_REQUEST,
-    DELETE_CATEGORY_SUCCESS
+    DELETE_CATEGORY_SUCCESS,
+    UPDATE_CATEGORY_FAIL,
+    UPDATE_CATEGORY_REQUEST,
+    UPDATE_CATEGORY_SUCCESS,
+    SET_SELECTED_CATEGORY
 } from '../constants/categoryConstants';
 import { API } from '../../Backend'
 import axios from 'axios'
@@ -15,7 +19,7 @@ import axios from 'axios'
 export const getCategories = (userId) => async (dispatch) => {
     try {
         dispatch({ type: GET_CATEGORIES_REQUEST })
-        console.log(userId.userId)
+
         const authAxios = axios.create({
             baseURL: API,
             headers: {
@@ -59,7 +63,6 @@ export const createCategory = (userId, name) => async (dispatch) => {
 
 export const deleteCategory = (categoryId) => async (dispatch) => {
     try {
-        console.log(categoryId)
         dispatch({ type: DELETE_CATEGORY_REQUEST });
 
         const authAxios = axios.create({
@@ -73,10 +76,39 @@ export const deleteCategory = (categoryId) => async (dispatch) => {
         const { data } = await authAxios.delete(
             `/api/category/delete/${categoryId}`
         );
-        console.log(data);
         dispatch({ type: DELETE_CATEGORY_SUCCESS, payload: data })
 
     } catch (error) {
         dispatch({ type: DELETE_CATEGORY_FAIL, payload: error.response.data.message })
     }
+}
+
+export const updateCategory = (userId, category) => async (dispatch) => {
+    try {
+        dispatch({ type: UPDATE_CATEGORY_REQUEST })
+
+        const authAxios = axios.create({
+            baseURL: API,
+            headers: {
+                "Content-type": 'application/json',
+            },
+            withCredentials: true
+        });
+
+        const { data } = await authAxios.put(
+            `/api/category/update/${userId}/${category._id}`,
+            category
+        );
+        console.log('datat', data)
+        dispatch({ type: UPDATE_CATEGORY_SUCCESS, payload: data });
+        return data
+
+    } catch (error) {
+        console.log('error', error)
+        dispatch({ type: UPDATE_CATEGORY_FAIL, payload: error.response.data.message })
+    }
+}
+
+export const selectedCategory = (category) => async (dispatch) => {
+    dispatch({ type: SET_SELECTED_CATEGORY, payload: category })
 }

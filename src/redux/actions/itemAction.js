@@ -27,9 +27,12 @@ export const createItem = (storeId, newItem) => async (dispatch) => {
 
         const { data } = await authAxios.post(`${API}/api/item/create/${storeId}`, newItem)
 
-        dispatch({ type: ITEM_CREATE_SUCCESS, payload: data.item })
+        dispatch({ type: ITEM_CREATE_SUCCESS, payload: data.item });
+
+        return data
     } catch (error) {
-        dispatch({ type: ITEM_CREATE_FAIL, payload: error.response.data.message })
+        dispatch({ type: ITEM_CREATE_FAIL, payload: error.response.data.message });
+        return error.response.data
     }
 }
 

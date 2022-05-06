@@ -16,7 +16,11 @@ import {
     UPDATE_ITEM_SUCCESS,
     DELETE_CATEGORY_REQUEST,
     DELETE_CATEGORY_FAIL,
-    DELETE_CATEGORY_SUCCESS
+    DELETE_CATEGORY_SUCCESS,
+    UPDATE_CATEGORY_REQUEST,
+    UPDATE_CATEGORY_FAIL,
+    UPDATE_CATEGORY_SUCCESS,
+    SET_SELECTED_CATEGORY
 } from '../constants/categoryConstants'
 
 const initialState = {
@@ -24,7 +28,8 @@ const initialState = {
     categories: [],
     error: null,
     success: false,
-    message: null
+    message: null,
+    selectedcategory: {}
 }
 
 
@@ -36,6 +41,7 @@ export const categoryReducer = (state = initialState, action) => {
         case DELETE_ITEM_REQUEST:
         case UPDATE_ITEM_REQUEST:
         case DELETE_CATEGORY_REQUEST:
+        case UPDATE_CATEGORY_REQUEST:
             return {
                 ...state,
                 loading: true,
@@ -47,6 +53,23 @@ export const categoryReducer = (state = initialState, action) => {
             return {
                 ...state,
                 categories: [...state.categories, action.payload.category],
+                loading: false,
+                success: true,
+                message: action.payload.message
+            }
+
+        case UPDATE_CATEGORY_SUCCESS:
+            return {
+                ...state,
+                categories: state.categories.map(category => {
+                    if (category._id === action.payload.category._id) {
+                        return {
+                            ...category,
+                            name: action.payload.category.name
+                        }
+                    }
+                    return category
+                }),
                 loading: false,
                 success: true,
                 message: action.payload.message
@@ -125,11 +148,19 @@ export const categoryReducer = (state = initialState, action) => {
         case DELETE_ITEM_FAIL:
         case UPDATE_ITEM_FAIL:
         case DELETE_CATEGORY_FAIL:
+        case UPDATE_CATEGORY_FAIL:
             return {
                 ...state,
                 error: action.payload,
                 loading: false,
                 success: false
+            }
+
+        case SET_SELECTED_CATEGORY:
+            return {
+                ...state,
+                selectedcategory: action.payload,
+                loading: false
             }
         default:
             return state

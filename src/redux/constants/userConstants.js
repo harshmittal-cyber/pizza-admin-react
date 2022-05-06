@@ -9,3 +9,4 @@ export const REGISTER_USER_FAIL = "REGISTER_USER_FAIL";
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
 
 export const CLEAR_ERRORS = 'CLEAR_ERRORS'
+export const RESET = 'RESET'
