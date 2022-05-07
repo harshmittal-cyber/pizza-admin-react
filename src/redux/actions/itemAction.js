@@ -59,7 +59,7 @@ export const deleteItem = (itemId) => async (dispatch) => {
     }
 }
 
-export const updateItem = (itemId) => async (dispatch) => {
+export const updateItem = (userId,itemId) => async (dispatch) => {
     try {
         dispatch({ type: UPDATE_ITEM_REQUEST })
 
@@ -71,12 +71,14 @@ export const updateItem = (itemId) => async (dispatch) => {
             withCredentials: true
         });
 
-        const { data } = await authAxios.put(`/api/item/update/${itemId}`);
+        const { data } = await authAxios.put(`/api/item/update/${itemId._id}`,itemId);
 
-        dispatch({ type: UPDATE_ITEM_SUCCESS, payload: data })
+        dispatch({ type: UPDATE_ITEM_SUCCESS, payload: data });
+        return data
 
 
     } catch (error) {
         dispatch({ type: UPDATE_ITEM_FAIL, payload: error.response.data.message })
+        return error.response.data
     }
 }

@@ -7,6 +7,8 @@ import Dashboard from './Dashboard'
 import Orders from "./pages/Orders";
 import Menu from './pages/menu/Menu';
 import AddItem from "./pages/menu/AddItem";
+import ForgotPassword from './pages/ResetPassword/forgotPassword'
+import ResetPassword from "./pages/ResetPassword/resetPassword";
 
 function App() {
   return (
@@ -14,7 +16,8 @@ function App() {
       <Routes>
         <Route exact path='/login' element={<Login />} />
         <Route exact path='/signup' element={<Signup />} />
-
+        <Route exact path='/forgotpassword' element={<ForgotPassword/>}/>
+        <Route exact path={`/admin/password/reset/:token`} element={<ResetPassword/>}/>
         <Route element={<PrivateRoute />}>
           <Route element={<Dashboard />}>
             <Route exact path='/' element={<HomePage />} />

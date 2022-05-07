@@ -79,11 +79,11 @@ const Login = () => {
             <div className="d-flex justify-content-center">
                 <div
                     className="col-lg-5 col-xl-4 p-12 p-xl-20 position-fixed start-0 top-0 h-screen overflow-y-hidden bg-primary d-none d-lg-flex flex-column">
-                    {/* <a className="d-block" href="#"><img src="https://clever-dashboard.webpixels.work/img/logos/clever-light.svg" className="h-10" alt="..." /></a> */}
                     <div className="mt-32 mb-20">
                         <h1 className="ls-tight font-bolder display-6 text-white mb-5">Let’s Eat something amazing today.</h1>
-                        <p className="text-white text-opacity-80">Maybe some text here will help me see it better. Oh God. Oke,
-                            let’s do it then.</p>
+                        <p className="text-white text-opacity-80">
+                            Maybe some text here will help me see it better. Oh God. Oke,let’s do it then.
+                        </p>
                     </div>
                     <div
                         className="w-56 h-56 bg-orange-500 rounded-circle position-absolute bottom-0 end-20 transform translate-y-1/3">
@@ -98,20 +98,30 @@ const Login = () => {
                                     <h1 className="ls-tight font-bolder h2">Nice to see you!</h1>
                                     {!displayError ? <></> : <span className='text-danger mt-2'>{errorMessage}</span>}
                                 </div>
-                                    <div className="mb-5"><label className="form-label" htmlFor="email">Email</label> <input
-                                            className="form-control" autoComplete="off" type="text" name="email" onChange={handleChange} />
-                                               <span className='text-danger'>{authError.emailError}</span>
-                                            </div>
+                                <div className="mb-5">
+                                    <label className="form-label" htmlFor="email">Email</label>
+                                    <input
+                                        className="form-control" autoComplete="off" 
+                                        type="text" name="email" onChange={handleChange} 
+                                    />
+                                    <span className='text-danger'>{authError.emailError}</span>
+                                </div>
                                     <div className="mb-5">
                                         <div className="d-flex align-items-center justify-content-between">
-                                            <div><label className="form-label" htmlFor="password">Password</label></div>
-                                            <div className="mb-2"><Link to="/forgotpassword"
+                                            <div>
+                                                <label className="form-label" htmlFor="password">Password</label>
+                                            </div>
+                                            <div className="mb-2">
+                                                <Link to={`/forgotpassword`}
                                                     className="text-sm text-muted text-primary-hover text-underline">Forgot
-                                                    password?</Link></div>
-                                        </div><input className="form-control" type="password"
-                                    name="password" onChange={handleChange} 
-                                            />
-                                    <span className='text-danger'>{authError.passwordError}</span>
+                                                    password?
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        <input className="form-control" type="password"
+                                            name="password" onChange={handleChange} 
+                                        />
+                                        <span className='text-danger'>{authError.passwordError}</span>
                                     </div>
                                     {/* <div><span className='text-danger'>{error}</span></div> */}
                                    
@@ -120,9 +130,13 @@ const Login = () => {
                                             Sign in
                                         </button>
                                     </div>
-                                <div className="mt-3 text-center"><small>Don't have
-                                an account?</small> <Link to="/signup"
-                                className="text-warning text-sm font-semibold">Sign up</Link></div>
+                                <div className="mt-3 text-center">
+                                    <small>Don't havean account?</small> 
+                                    <Link to="/signup"
+                                        className="text-warning text-sm font-semibold">
+                                        Sign up
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>

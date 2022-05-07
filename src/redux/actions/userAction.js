@@ -7,7 +7,13 @@ import {
     REGISTER_USER_FAIL,
     CLEAR_ERRORS,
     LOGOUT_SUCCESS,
-    RESET
+    RESET,
+    FORGOT_PASSWORD_FAIL,
+    FORGOT_PASSWORD_REQUEST,
+    FORGOT_PASSWORD_SUCCESS,
+    RESET_PASSWORD_FAIL,
+    RESET_PASSWORD_REQUEST,
+    RESET_PASSWORD_SUCCESS
 } from '../constants/userConstants'
 
 import axios from 'axios';
@@ -82,6 +88,57 @@ export const logout = () => async (dispatch) => {
     await authAxios.get(`/api/admin/logout`);
 
     dispatch({ type: LOGOUT_SUCCESS })
+}
+
+export const forgotpassword=(email)=>async (dispatch)=>{
+    try{
+        dispatch({type:FORGOT_PASSWORD_REQUEST})
+
+        const authAxios = axios.create({
+            baseURL: API,
+            headers: {
+                "Content-type": 'application/json',
+            },
+            withCredentials: true
+        });
+
+        const { data } = await authAxios.post(
+            `/api/admin/forgot`,
+            {email},
+        );
+
+        dispatch({ type: FORGOT_PASSWORD_SUCCESS, payload: data });
+        return data
+
+    }catch(error){
+        dispatch({type:FORGOT_PASSWORD_FAIL,payload:error.response.data.message})
+        return error.response.data
+        
+    }
+}
+
+export const resetPassword=(token,password)=>async (dispatch)=>{
+    try{
+        dispatch({type:RESET_PASSWORD_REQUEST})
+
+        const authAxios = axios.create({
+            baseURL: API,
+            headers: {
+                "Content-type": 'application/json',
+            },
+            withCredentials: true
+        });
+
+        const {data}=await authAxios.put(`/api/admin/password/reset/${token}`,{password})
+
+        dispatch({type:RESET_PASSWORD_SUCCESS,payload:data})
+        return data
+
+
+    }catch(error){
+        dispatch({type:RESET_PASSWORD_FAIL,payload:error.response.data.message})
+        return error.response.data
+    }
 }
 
 export const clearerror = () => async (dispatch) => {

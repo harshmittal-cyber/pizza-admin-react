@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react'
 import {useSelector, useDispatch} from 'react-redux';
 import { Link } from 'react-router-dom';
 import { deleteCategory, getCategories,createCategory ,updateCategory,selectedCategory} from '../../redux/actions/categoryAction';
-import {deleteItem ,createItem} from '../../redux/actions/itemAction';
+import {deleteItem ,createItem,updateItem} from '../../redux/actions/itemAction';
 import Toaster from '../../utility/Toaster';
 import Modal from '../../utility/Modal';
 import TagsInput from './TagsInput'
@@ -155,6 +155,11 @@ const Menu = () => {
    })
   }
 
+  const handleStockUpdate=(item)=>{
+    let newitem={...item,inStock:!item.inStock}
+    dispatch(updateItem(user._id,newitem))
+  }
+
 
   const handleItemDelete=(itemId)=>{
     dispatch(deleteItem(itemId))
@@ -171,6 +176,11 @@ const Menu = () => {
   //close and open add item modal
   const closeItemModal=()=>{
     document.getElementById("closeadditemmodal").click();
+  }
+
+  // close and open update item modal
+  const openUpdateItemModal=()=>{
+    document.getElementById('updateitemmodalbutton').click()
   }
 
   //close and open modal
@@ -306,6 +316,77 @@ const Menu = () => {
         <button className='d-none' data-bs-dismiss="modal" id="closeadditemmodal">Close any modal</button>
       </Modal>
 
+      {/* update item modal */}
+      <Modal targetName={'updateitemmodal'}>
+        <div className='p-5 text-center'>
+          <h1 className='pb-5'>Update Item</h1>
+          <form id='item-form' autoComplete='off'>
+          <div className='mt-5'>
+              <label htmlFor="categoryId" className='w-100 text-start'>Select Category</label>
+              <select className='form-select text-capitalize' name="categoryId" 
+              value={Object.keys(selectedcategory).length>1?JSON.stringify(selectedcategory): categories.length!==0? JSON.stringify(categories[0]) : JSON.stringify({})}
+              onChange={(e) => handleCategoryValue(e, e.target.value)}  id="" style={{backgroundColor:"#EDF2F7"}}>
+                {
+                  categories.map((cate,index)=>(
+                    <option key={index} value={JSON.stringify(cate)}>{cate.name}</option>
+                  ))
+                }
+              </select>
+            </div>
+            <div className='mt-5'>
+              <label htmlFor="itemName" className='w-100 text-start'>Item Name</label>
+              <input className='form-control' type="text" name="itemName" id="" 
+                onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()}
+                placeholder='Enter Item Name' style={{backgroundColor:"#EDF2F7"}}
+                value={inputs.itemName} onChange={handleAddItemChange} 
+              />
+              {/* <span className='text-danger'>{addItemError.itemNameError}</span> */}
+            </div>
+            <div className='mt-5'>
+              <label htmlFor="description" className='w-100 text-start'>Item Description</label>
+              <input className='form-control' type="text" 
+              onKeyPress={(e) => e.key === 'Enter' && e.preventDefault()} 
+              name="description" id="description" placeholder='Enter Item Description' style={{backgroundColor:"#EDF2F7"}} 
+              value={inputs.description} onChange={handleAddItemChange} 
+               />
+            </div>
+            <div className='mt-5'>
+              <label htmlFor="price" className='w-100 text-start'>Item Price</label>
+              <input className='form-control' type="text" name="price" 
+              id="price" placeholder='Enter Item Price' style={{backgroundColor:"#EDF2F7"}}
+              value={inputs.price} onChange={handleAddItemChange} 
+              />
+            </div>
+            <div className='mt-5'>
+              <label htmlFor="tags" className='w-100 text-start'>Tags</label>
+              <TagsInput onChange={tagHandler} resetTags={resetTags} defaultTags={[...inputs.tags]}/>              
+            </div>
+            <div className='mt-5 d-flex align-items-center justify-content-between'>
+                <p className="mb-0">Mark as Non - Veg</p>
+                <div className="form-check form-switch">
+								<input className="form-check-input" type="checkbox" name="isNonVeg"
+                onChange={handleAddItemChange}
+                checked={checked}
+              />
+							</div>
+            </div>
+            <div className="row mt-5">
+                <div className='col-6'>
+                  <button className='btn btn-outline-primary w-100' onClick={(e)=>handleAddItem(e,false)}>
+                    <span >Save</span>
+                  </button>
+                </div>
+                <div className='col-6'>
+                  <button className='btn btn-primary w-100' onClick={(e)=>handleAddItem(e,true)}>
+                    <span>Add more</span>
+                  </button>
+                </div>
+              </div>
+          </form>
+        </div>
+        <button className='d-none' data-bs-dismiss="modal" id="closeupdateitemmodal">Close any modal</button>
+      </Modal>
+
       {/* update category Modal */}
       <Modal targetName={'updateCategoryName'}>
         <div className='p-lg-5 p-1 text-center'>
@@ -390,8 +471,8 @@ const Menu = () => {
               </td>}
 
               <td>
-                <button className='btn btn-neutral btn-sm me-3'>Unavailable</button>
-                <button className='btn btn-neutral btn-sm me-3'><i className='bi bi-pencil'></i></button>
+                <button className='btn btn-neutral btn-sm me-3' onClick={()=>handleStockUpdate(item)}>{item.inStock?'Unavailable':'Available'}</button>
+                <button className='btn btn-neutral btn-sm me-3' onClick={openUpdateItemModal}><i className='bi bi-pencil'></i></button>
                 <button className='btn btn-neutral btn-sm' onClick={()=>handleItemDelete(item._id)}><i className='bi bi-trash'></i></button>
               </td>
             </tr>
@@ -405,6 +486,7 @@ const Menu = () => {
   {toaster && message && <Toaster text={message} icon={'tick'} showIcon={true} />}
   {toaster && error && <Toaster text={error} icon={'x'} showIcon={true} />}
   {/* utility buttons for opening and closing of modals dynimically */}
+  <button className='d-none' data-bs-toggle="modal" data-bs-target="#updateitemmodal" id='updateitemmodalbutton'>Open Update item modal</button>
   <button className='d-none' data-bs-toggle="modal" data-bs-target="#additemmodal" id='additemmodalbutton'>Open Add item modal</button>
     <button className='d-none' data-bs-toggle="modal" data-bs-target="#editItemModal" id='edititemmodalbutton'>Open Edit item modal</button>
     <button className='d-none' data-bs-toggle="modal" data-bs-target="#updateCategoryName" id='updatecategoryname'>Open Add item modal</button>
