@@ -76,10 +76,12 @@ export const deleteCategory = (categoryId) => async (dispatch) => {
         const { data } = await authAxios.delete(
             `/api/category/delete/${categoryId}`
         );
-        dispatch({ type: DELETE_CATEGORY_SUCCESS, payload: data })
+        dispatch({ type: DELETE_CATEGORY_SUCCESS, payload: data });
+        return data
 
     } catch (error) {
-        dispatch({ type: DELETE_CATEGORY_FAIL, payload: error.response.data.message })
+        dispatch({ type: DELETE_CATEGORY_FAIL, payload: error.response.data.message });
+        return error.response.data
     }
 }
 

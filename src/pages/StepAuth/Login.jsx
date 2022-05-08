@@ -7,8 +7,6 @@ import {useNavigate,Link} from 'react-router-dom'
 
 const Login = () => {
     const {loading,error,isAuthenticated}=useSelector((state)=>state.userReducer)
-    const [email,setEmail]=useState('');
-    const [password,setPassword]=useState('');
     const [loginDetails,setLoginDetails]=useState({email:'',password:''})
     const [loginerror,setLoginError]=useState("");
     const [errorMessage,setErrorMessage]=useState("")
@@ -43,18 +41,30 @@ const Login = () => {
         }
         return true
     }
-    const submit=()=>{
+
+    const handleSubmit=()=>{
         if(loginValidate()){
-            dispatch(login(loginDetails))
-            .then((res)=>{
-                console.log('jhghbjkl',res)
-                if(!res.success){
-                    displayErrorFunction(res.message);
-                }
-            })
+            if(!emailValidation()){
+                displayErrorFunction(`Invalid Email ${loginDetails.email}`)
+            }else {
+                dispatch(login(loginDetails))
+                .then((res)=>{
+                    if(!res.success){
+                        displayErrorFunction(res.message);
+                    }
+                })
+            }
         }else{
             displayErrorFunction("")
         }
+    }
+
+    const emailValidation = () => {
+        const regex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        if(!loginDetails.email || regex.test(loginDetails.email) === false){
+            return false;
+        }
+        return true;
     }
 
     const displayErrorFunction=(message)=>{
@@ -126,7 +136,7 @@ const Login = () => {
                                     {/* <div><span className='text-danger'>{error}</span></div> */}
                                    
                                     <div>
-                                        <button onClick={submit} className="btn btn-primary w-full">
+                                        <button onClick={handleSubmit} className="btn btn-primary w-full">
                                             Sign in
                                         </button>
                                     </div>

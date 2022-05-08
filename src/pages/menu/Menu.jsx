@@ -14,6 +14,7 @@ const Menu = () => {
   const [category,setCategory]=useState('');
   const [redirect,setRedirect]=useState(false);
   const [toaster,setToaster]=useState(false);
+  const [errorMessage,setErrorMessage]=useState(null)
   const [inputs,setInputs]=useState({itemName:'',description:'',price:'',tags:[]})
   const [resetTags,setResetTags]=useState(false);
   const [checked,setChecked]=useState(false);
@@ -21,6 +22,19 @@ const Menu = () => {
   
   // edit category
   const [editCategory,setEditCategory]=useState({name:''});
+
+  const addItemInitialState={
+    itemNameError:"",
+    itemPriceError:""
+  }
+
+  const editItemInitialState={
+    itemNameError:"",
+    itemPriceError:""
+  }
+
+  const [addItemError,setAddItemError]=useState(addItemInitialState);
+  const [editItemError,setEditItemError]=useState(editItemInitialState);
   useEffect(()=>{
     if(categories.length===0){
       const userId=user._id
@@ -47,9 +61,9 @@ const Menu = () => {
 
       if(filterCategory.length<1){
         setRedirect(isRedirect);
+        console.log(user._id)
         await dispatch(createCategory(user._id, category, isRedirect))
         .then(res=>{
-          console.log('res',res)
           if(res.success){
             setToaster(true)
             closeCategoryModal();
@@ -66,7 +80,9 @@ const Menu = () => {
   }
 
   const handleCategoryDelete = (category) =>{
-    dispatch(deleteCategory(category._id))
+    dispatch(deleteCategory(category._id)).then((res)=>{
+      setToaster(true)
+    })
   }
 
   // catgeory update
@@ -81,7 +97,7 @@ const Menu = () => {
 
   const handleCategoryUpdate=async ()=>{
     if(editCategory.name.trim().length<1){
-      displayErrorFunction("Plese Enter a Category Name")
+      displayErrorFunction("Please Enter a Category Name")
     }else{
       let filterCategory =await categories.filter(cate =>(cate._id!==editCategory._id) && (cate.name.trim().toLowerCase() === editCategory.name.trim().toLowerCase()));
       
@@ -133,26 +149,65 @@ const Menu = () => {
     setResetTags(false)
   }
 
+  const handleKeyPress=(e,edit)=>{
+    if (e.key === 'Enter') {
+      e.preventDefault()
+    }
+    let itemPriceError=""
+    const re = /^[0-9]*$/
+    if (!re.test(e.key)) {
+        e.preventDefault();
+        itemPriceError="Only Numbers are Allowed"
+        if(edit){ 
+          setEditItemError({...editItemError,itemPriceError})
+        }else{
+          setAddItemError({...addItemError,itemPriceError});
+        }
+        displayErrorFunction("")
+
+    } else if (re.test(e.key)) {
+        displayErrorFunction("")
+      }
+  }
+
+  const addItemValidate=()=>{
+    let itemNameError=""
+    let itemPriceError=""
+    if(inputs.itemName.trim().length<1){
+      itemNameError="Item Name is Required"
+    }
+    if(inputs.price.trim().length<1){
+      itemPriceError="Item Price is Required"
+    }
+    if(itemNameError || itemPriceError){
+      setAddItemError({itemNameError,itemPriceError})
+      return false
+    }
+    return true
+  }
+
   const handleAddItem=async (e,isMore)=>{
     e.preventDefault()
-  
-    let category=Object.keys(selectedcategory).length!==0?selectedcategory._id:categoryId
-    let newItem={...inputs,categoryId:category};
+    if(addItemValidate()){
+      let category=Object.keys(selectedcategory).length!==0?selectedcategory._id:categoryId
+      let newItem={...inputs,categoryId:category};
 
+      dispatch(createItem(user._id,newItem)).then((res)=>{
+          setToaster(true)
+          if(res.success){
+            setInputs({itemName:'',description:'',price:'',tags:[]})
+            setChecked(false)
+            setResetTags(true)
+            closeItemModal()
+            if(isMore){
+              addItemModalHandler()
+            }
+          }
 
-   dispatch(createItem(user._id,newItem)).then((res)=>{
-     console.log('res',res)
-      if(res.success){
-        setToaster(true)
-        setInputs({itemName:'',description:'',price:'',tags:[]})
-        setChecked(false)
-        setResetTags(true)
-        closeItemModal()
-        if(isMore){
-          addItemModalHandler()
-        }
-      }
-   })
+      })
+    }else{
+      displayErrorFunction('')
+    }
   }
 
   const handleStockUpdate=(item)=>{
@@ -162,7 +217,9 @@ const Menu = () => {
 
 
   const handleItemDelete=(itemId)=>{
-    dispatch(deleteItem(itemId))
+    dispatch(deleteItem(itemId)).then((res)=>{
+      setToaster(true)
+    })
   }
 
   // modals
@@ -195,7 +252,12 @@ const Menu = () => {
   }
 
   const displayErrorFunction=(message)=>{
-
+    setErrorMessage(message)
+    setTimeout(()=>{
+      setErrorMessage(null)
+      setAddItemError(addItemInitialState);
+      setEditItemError(editItemInitialState);
+    },3000)
   }
 
 
@@ -224,6 +286,7 @@ const Menu = () => {
                 <input type="text" name="categoryname" className='form-control' placeholder='Enter Category Name'
                   value={category} onChange={handleCategoryChange} style={{backgroundColor:"#EDF2F7"}} />
               </div>
+              {errorMessage!==null && <span className='text-danger small'>{errorMessage}</span>}
               
               {/* Buttons */}
               <div className="row">
@@ -269,7 +332,7 @@ const Menu = () => {
                 placeholder='Enter Item Name' style={{backgroundColor:"#EDF2F7"}}
                 value={inputs.itemName} onChange={handleAddItemChange} 
               />
-              {/* <span className='text-danger'>{addItemError.itemNameError}</span> */}
+               <div className='w-100 text-start small text-danger mt-2'>{addItemError.itemNameError}</div>
             </div>
             <div className='mt-5'>
               <label htmlFor="description" className='w-100 text-start'>Item Description</label>
@@ -283,8 +346,10 @@ const Menu = () => {
               <label htmlFor="price" className='w-100 text-start'>Item Price</label>
               <input className='form-control' type="text" name="price" 
               id="price" placeholder='Enter Item Price' style={{backgroundColor:"#EDF2F7"}}
+              onKeyPress={handleKeyPress}
               value={inputs.price} onChange={handleAddItemChange} 
               />
+              <div className='w-100 text-start small text-danger mt-2'>{addItemError.itemPriceError}</div>
             </div>
             <div className='mt-5'>
               <label htmlFor="tags" className='w-100 text-start'>Tags</label>
@@ -401,6 +466,7 @@ const Menu = () => {
                       value={editCategory.name} onChange={handleCategoryUpdateChange}
                     />
                 </div>
+                {errorMessage!==null && <span className='w-100 text-start text-danger'>{errorMessage}</span>}
                 
                 <div className="row">
                   <div className="col-md-6 col-sm-12 mt-4 pt-5">
@@ -431,10 +497,6 @@ const Menu = () => {
             <button className="dropdown-item cursor-pointer text-primary-hover" onClick={()=>updateCategoryModalHandler(category)}>
               Edit Name
             </button>
-            
-            <Link to='/additem' state={{categoryId:category._id}}>
-              <span className="dropdown-item cursor-pointer text-primary-hover">Add new item</span>
-            </Link>
             
             <button className="dropdown-item cursor-pointer text-primary-hover"
               onClick={() =>handleCategoryDelete(category)}>

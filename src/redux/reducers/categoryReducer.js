@@ -47,6 +47,7 @@ export const categoryReducer = (state = initialState, action) => {
                 loading: true,
                 message: null,
                 success: false,
+                error:null
             }
 
         case CATEGORY_CREATE_SUCCESS:
@@ -96,17 +97,18 @@ export const categoryReducer = (state = initialState, action) => {
             return {
                 ...state,
                 categories: state.categories.map((cate) => {
-                    if (cate._id === action.payload.categoryId) {
+                    if (cate._id === action.payload.item.categoryId) {
                         return {
                             ...cate,
-                            items: [...cate.items, action.payload]
+                            items: [...cate.items, action.payload.item]
                         }
                     }
                     return cate
                 }),
                 loading: false,
                 success: true,
-                error: null
+                error: null,
+                message:action.payload.message
             }
 
         case DELETE_ITEM_SUCCESS:
@@ -120,7 +122,8 @@ export const categoryReducer = (state = initialState, action) => {
                 }),
                 loading: false,
                 success: true,
-                error: null
+                error: null,
+                message:action.payload.message
             }
 
         case UPDATE_ITEM_SUCCESS:

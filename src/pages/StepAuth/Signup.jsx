@@ -6,11 +6,6 @@ import {useNavigate,Link} from 'react-router-dom'
 
 const Signup = () => {
     const {loading,error,isAuthenticated}=useSelector((state)=>state.userReducer)
-
-    const [email,setEmail]=useState('');
-    const [password,setPassword]=useState('');
-    const [storeName,setStoreName]=useState('');
-    const [confirmPassword,setConfirmPassword]=useState('');
     const [signuperror,setSignupError]=useState('');
     const [signupDetails,setSignupDetails]=useState({email:'',password:'',storeName:'',confirmPassword:''})
 
@@ -28,7 +23,6 @@ const Signup = () => {
     const navigate=useNavigate();
 
     const handleChange=(e)=>{
-        console.log(e.target.name,e.target.value)
         setSignupDetails((prevState)=>({
             ...prevState,
             [e.target.name]:e.target.value
@@ -40,7 +34,7 @@ const Signup = () => {
         let passwordError=""
         let storeNameError=""
         let confirmPasswordError=""
-
+   
         if(signupDetails.email.trim().length===0){
             emailError='Email is required'
         }
@@ -63,22 +57,32 @@ const Signup = () => {
     const submit=()=>{
         
         if(signupValidate()){
-            if(signupDetails.password.trim().length<8){
-                displayErrorFunction('Password length should be equal to 8')
-            }else if(signupDetails.password!==signupDetails.confirmPassword){
-                displayErrorFunction('Confirm Password Not matched')
-            }else{
-                dispatch(register(signupDetails))
-                .then((res)=>{
-                    console.log(res)
-                    if(!res.success){
-                        displayErrorFunction(res.message);
-                    }
-                })
-            }
+                if(signupDetails.password.trim().length<8){
+                    displayErrorFunction('Password length should be equal to 8')
+                }else if(signupDetails.password!==signupDetails.confirmPassword){
+                    displayErrorFunction('Confirm Password Not matched')
+                }else if(!emailValidation()){
+                    displayErrorFunction(`Invalid Email ${signupDetails.email}`)
+                }else{
+                    dispatch(register(signupDetails))
+                    .then((res)=>{
+                        console.log(res)
+                        if(!res.success){
+                            displayErrorFunction(res.message);
+                        }
+                    })
+                }
         }else{
             displayErrorFunction('')
         }
+    }
+
+    const emailValidation = () => {
+        const regex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        if(!signupDetails.email || regex.test(signupDetails.email) === false){
+            return false;
+        }
+        return true;
     }
 
     const displayErrorFunction=(message)=>{
@@ -125,14 +129,14 @@ const Signup = () => {
                                     </div>
                                         <div className="mb-5"><label className="form-label" htmlFor="username">Email</label> <input
                                                 type="username" className="form-control" id="username" name="email" autoComplete="off" onChange={handleChange} />
-                                                  <span className='text-danger text-sm'>{authError.emailError}</span>
+                                                  <span className='text-danger small'>{authError.emailError}</span>
                                                 </div>
                                             <div className="mb-5">
                                             <div className="d-flex align-items-center justify-content-between">
                                                 <div><label className="form-label" htmlFor="storename">StoreName</label></div>
                                             </div><input type="text" className="form-control" id="storename" name="storeName" autoComplete="off" onChange={handleChange}
                                                     />
-                                    <span className='text-danger text-sm'>{authError.storeNameError}</span>
+                                    <div className='text-danger small'>{authError.storeNameError}</div>
 
                                         </div>
                                         <div className="mb-5">
@@ -140,13 +144,13 @@ const Signup = () => {
                                                 <div><label className="form-label" htmlFor="password">Password</label></div>
                                             </div><input type="password" className="form-control" id="password" name="password" autoComplete="off" onChange={handleChange}
                                                     />
-                                              <span className='text-danger text-sm'>{authError.passwordError}</span>
+                                              <span className='text-danger small'>{authError.passwordError}</span>
                                         </div>
                                         <div className="mb-5">
                                             <div className="d-flex align-items-center justify-content-between">
-                                                <div><label className="form-label" htmlFor="password">Confirm Password</label></div>
-                                            </div><input type="password" className="form-control" id="password" name="confirmPassword" autoComplete="off" onChange={handleChange} />
-                                            <span className='text-danger text-sm'>{authError.confirmPasswordError}</span>
+                                                <div><label className="form-label" htmlFor="confirmpassword">Confirm Password</label></div>
+                                            </div><input type="password" className="form-control" id="confirmpassword" name="confirmPassword" autoComplete="off" onChange={handleChange} />
+                                            <span className='text-danger small'>{authError.confirmPasswordError}</span>
                                         </div>
                                         <div>
                                             <button onClick={submit} className="btn btn-primary w-full" >

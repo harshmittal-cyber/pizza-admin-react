@@ -6,9 +6,9 @@ import HomePage from './pages/HomePage'
 import Dashboard from './Dashboard'
 import Orders from "./pages/Orders";
 import Menu from './pages/menu/Menu';
-import AddItem from "./pages/menu/AddItem";
 import ForgotPassword from './pages/ResetPassword/forgotPassword'
 import ResetPassword from "./pages/ResetPassword/resetPassword";
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
@@ -23,9 +23,10 @@ function App() {
             <Route exact path='/' element={<HomePage />} />
             <Route exatc path='/orders' element={<Orders />} />
             <Route exatc path='/menu' element={<Menu />} />
-            <Route exact path='/additem' element={<AddItem />} />
           </Route>
         </Route>
+
+        <Route path={'*'} element={<NotFound/>}/>
       </Routes>
     </Router >
   );
