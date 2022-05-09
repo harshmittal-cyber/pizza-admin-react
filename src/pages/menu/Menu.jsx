@@ -157,12 +157,6 @@ const Menu = () => {
     const re = /^[0-9]*$/
     if (!re.test(e.key)) {
         e.preventDefault();
-        itemPriceError="Only Numbers are Allowed"
-        if(edit){ 
-          setEditItemError({...editItemError,itemPriceError})
-        }else{
-          setAddItemError({...addItemError,itemPriceError});
-        }
         displayErrorFunction("")
 
     } else if (re.test(e.key)) {
@@ -405,7 +399,6 @@ const Menu = () => {
                 placeholder='Enter Item Name' style={{backgroundColor:"#EDF2F7"}}
                 value={inputs.itemName} onChange={handleAddItemChange} 
               />
-              {/* <span className='text-danger'>{addItemError.itemNameError}</span> */}
             </div>
             <div className='mt-5'>
               <label htmlFor="description" className='w-100 text-start'>Item Description</label>
