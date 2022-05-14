@@ -26,11 +26,10 @@ export const createItem = (storeId, newItem) => async (dispatch) => {
         });
 
         const { data } = await authAxios.post(`${API}/api/item/create/${storeId}`, newItem)
-        console.log('daa',data)
-        dispatch({ type: ITEM_CREATE_SUCCESS, payload: data});
+        console.log('daa', data)
+        dispatch({ type: ITEM_CREATE_SUCCESS, payload: data });
         return data
 
-        return data
     } catch (error) {
         dispatch({ type: ITEM_CREATE_FAIL, payload: error.response.data.message });
         return error.response.data
@@ -61,7 +60,7 @@ export const deleteItem = (itemId) => async (dispatch) => {
     }
 }
 
-export const updateItem = (userId,itemId) => async (dispatch) => {
+export const updateItem = (userId, itemId) => async (dispatch) => {
     try {
         dispatch({ type: UPDATE_ITEM_REQUEST })
 
@@ -73,7 +72,7 @@ export const updateItem = (userId,itemId) => async (dispatch) => {
             withCredentials: true
         });
 
-        const { data } = await authAxios.put(`/api/item/update/${itemId._id}`,itemId);
+        const { data } = await authAxios.put(`/api/item/update/${itemId._id}`, itemId);
 
         dispatch({ type: UPDATE_ITEM_SUCCESS, payload: data });
         return data

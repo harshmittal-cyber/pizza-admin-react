@@ -5,7 +5,8 @@ import { deleteCategory, getCategories,createCategory ,updateCategory,selectedCa
 import {deleteItem ,createItem,updateItem} from '../../redux/actions/itemAction';
 import Toaster from '../../utility/Toaster';
 import Modal from '../../utility/Modal';
-import TagsInput from './TagsInput'
+import TagsInput from './TagsInput';
+import Resizer from 'react-image-file-resizer'
 
 const Menu = () => {
   const dispatch=useDispatch();
@@ -19,13 +20,14 @@ const Menu = () => {
   const [resetTags,setResetTags]=useState(false);
   const [checked,setChecked]=useState(false);
   const [categoryId,setCategoryId]=useState(categories.length!==0 && categories[0]._id)
-  
+  const [imageInputs,setImageInputs]=useState(null)
   // edit category
   const [editCategory,setEditCategory]=useState({name:''});
 
   const addItemInitialState={
     itemNameError:"",
-    itemPriceError:""
+    itemPriceError:"",
+    imageInputError:""
   }
 
   const editItemInitialState={
@@ -167,14 +169,18 @@ const Menu = () => {
   const addItemValidate=()=>{
     let itemNameError=""
     let itemPriceError=""
+    let imageInputError=''
+    if(imageInputs===null){
+      imageInputError='Item Image is Required'
+    }
     if(inputs.itemName.trim().length<1){
       itemNameError="Item Name is Required"
     }
     if(inputs.price.trim().length<1){
       itemPriceError="Item Price is Required"
     }
-    if(itemNameError || itemPriceError){
-      setAddItemError({itemNameError,itemPriceError})
+    if(itemNameError || itemPriceError || imageInputError){
+      setAddItemError({itemNameError,itemPriceError,imageInputError})
       return false
     }
     return true
@@ -184,20 +190,20 @@ const Menu = () => {
     e.preventDefault()
     if(addItemValidate()){
       let category=Object.keys(selectedcategory).length!==0?selectedcategory._id:categoryId
-      let newItem={...inputs,categoryId:category};
+      let newItem={...inputs,categoryId:category,image:imageInputs};
 
       dispatch(createItem(user._id,newItem)).then((res)=>{
           setToaster(true)
           if(res.success){
             setInputs({itemName:'',description:'',price:'',tags:[]})
             setChecked(false)
+            setImageInputs(null)
             setResetTags(true)
             closeItemModal()
             if(isMore){
               addItemModalHandler()
             }
           }
-
       })
     }else{
       displayErrorFunction('')
@@ -254,6 +260,27 @@ const Menu = () => {
     },3000)
   }
 
+  const resizeFile = (file) =>
+    new Promise((resolve) => {
+      Resizer.imageFileResizer(file,300,300,"JPEG",100,0,(uri) => {
+          resolve(uri);
+        },
+        "base64"
+      );
+    }
+  );
+
+  const handleAddImage=async (e)=>{
+    const file=e.target.files[0];
+  
+    const image = await resizeFile(file);
+    setImageInputs(image)
+  }
+
+  const handleRemoveImage=()=>{
+    setImageInputs(null)
+  }
+
 
   return (
     <section className='pb-10'>
@@ -307,7 +334,27 @@ const Menu = () => {
         <div className='p-5 text-center'>
           <h1 className='pb-5'>Add Item</h1>
           <form id='item-form' autoComplete='off'>
-          <div className='mt-5'>
+          {imageInputs!==null?
+                <div>
+                  <img src={`${imageInputs}`} width={150} height={100}/>
+                  <button onClick={handleRemoveImage}>x</button>
+                </div>
+              :
+              <>
+              <div className="w-100 d-flex align-items-center justify-content-between p-3 px-5 rounded cursor-pointer" style={{ backgroundColor: "#EDF2F7" }}>
+                  <label htmlFor='file-input'>
+                      <div className='d-flex align-items center'>
+                          <img src="/assets/img/image.png" className='me-3' alt="" />
+                          <p className="mb-0 text-dark">Upload item photo</p>
+                      </div>
+                      <i className='bi bi-upload'></i>
+                  </label>
+                  <input type='file' name='file' id='file-input' style={{ display: 'none' }} onChange={handleAddImage} />
+              </div>
+              <div className='w-100 text-start small text-danger mt-2'>{addItemError.imageInputError}</div>
+              </>
+            }
+            <div className='mt-5'>
               <label htmlFor="categoryId" className='w-100 text-start'>Select Category</label>
               <select className='form-select text-capitalize' name="categoryId" 
               value={Object.keys(selectedcategory).length>1?JSON.stringify(selectedcategory): categories.length!==0? JSON.stringify(categories[0]) : JSON.stringify({})}
@@ -518,8 +565,8 @@ const Menu = () => {
                   alt="" /></td>
               <td>{item.itemName}</td>
               <td>Rs {item.price}</td>
-              {!item.isNonVeg ? <td><span class="badge badge-lg badge-dot"><i class="bg-success"></i>Veg</span></td> : <td>
-                <span class="badge badge-lg badge-dot"><i class="bg-danger"></i>Non Veg</span></td>}
+              {!item.isNonVeg ? <td><span className="badge badge-lg badge-dot"><i className="bg-success"></i>Veg</span></td> : <td>
+                <span className="badge badge-lg badge-dot"><i className="bg-danger"></i>Non Veg</span></td>}
               {item.inStock ? <td><span
                   className='bg-soft-success text-success rounded-pill badge badge-sm fw-normal'>Available</span></td> :
               <td><span className='bg-soft-danger text-danger rounded-pill badge badge-sm fw-normal'>Not Available</span>
