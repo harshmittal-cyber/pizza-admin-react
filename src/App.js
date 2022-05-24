@@ -16,17 +16,17 @@ function App() {
       <Routes>
         <Route exact path='/login' element={<Login />} />
         <Route exact path='/signup' element={<Signup />} />
-        <Route exact path='/forgotpassword' element={<ForgotPassword/>}/>
-        <Route exact path={`/admin/password/reset/:token`} element={<ResetPassword/>}/>
+        <Route exact path='/forgotpassword' element={<ForgotPassword />} />
+        <Route exact path={`/admin/password/reset/:token`} element={<ResetPassword />} />
         <Route element={<PrivateRoute />}>
           <Route element={<Dashboard />}>
             <Route exact path='/' element={<HomePage />} />
-            <Route exatc path='/orders' element={<Orders />} />
+            <Route exact path='/orders' element={<Orders />} />
             <Route exatc path='/menu' element={<Menu />} />
           </Route>
         </Route>
 
-        <Route path={'*'} element={<NotFound/>}/>
+        <Route path={'*'} element={<NotFound />} />
       </Routes>
     </Router >
   );

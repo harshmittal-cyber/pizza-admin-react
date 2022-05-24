@@ -38,10 +38,10 @@ const Menu = () => {
   const [addItemError,setAddItemError]=useState(addItemInitialState);
   const [editItemError,setEditItemError]=useState(editItemInitialState);
   useEffect(()=>{
-    if(categories.length===0){
+    // if(categories.length===0){
       const userId=user._id
       dispatch(getCategories({userId}))
-    }
+    // }
   },[])
 
   //category changes
@@ -560,7 +560,7 @@ const Menu = () => {
           <tbody>
             {category.items.map((item, index)=>(
             <tr key={index} className="text-heading">
-              <td><img className='shadow' src={item.image}
+              <td><img className='shadow' src={`http://localhost:4000${item.image}`}
                   style={{objectFit: "cover", objectPosition: "center", borderRadius: "8px", height: "50px", width: "50px"}}
                   alt="" /></td>
               <td>{item.itemName}</td>
