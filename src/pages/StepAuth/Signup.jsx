@@ -123,7 +123,7 @@ const Signup = () => {
                             <div className="row">
                                 <div className="col-lg-10 col-md-9 col-xl-6 mx-auto ms-xl-0">
                                     <div className="mt-2 mt-lg-2 mb-6 d-lg-block">
-                                        <h1 className="ls-tight font-bolder h2">Create your account!</h1>
+                                        <h1 className="ls-tight font-bolder h2" >Create your account!</h1>
                                         <p>It's free and easy</p>
                                         {!displayError ? <></> : <span className='text-danger mt-2 '>{signuperror}</span>}
                                     </div>
