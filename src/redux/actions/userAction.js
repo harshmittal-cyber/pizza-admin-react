@@ -36,7 +36,7 @@ export const login = (user) => async (dispatch) => {
             `/api/admin/login`,
             user,
         );
-        console.log(data)
+        localStorage.setItem("token", data.token);
         dispatch({ type: LOGIN_SUCCESS, payload: data });
         return data
     } catch (error) {
@@ -63,7 +63,7 @@ export const register = (user) => async (dispatch) => {
             user,
         );
 
-        console.log(data)
+        localStorage.setItem("token", data.token)
         dispatch({ type: REGISTER_USER_SUCCESS, payload: data });
 
         return data
@@ -90,9 +90,9 @@ export const logout = () => async (dispatch) => {
     dispatch({ type: LOGOUT_SUCCESS })
 }
 
-export const forgotpassword=(email)=>async (dispatch)=>{
-    try{
-        dispatch({type:FORGOT_PASSWORD_REQUEST})
+export const forgotpassword = (email) => async (dispatch) => {
+    try {
+        dispatch({ type: FORGOT_PASSWORD_REQUEST })
 
         const authAxios = axios.create({
             baseURL: API,
@@ -104,22 +104,22 @@ export const forgotpassword=(email)=>async (dispatch)=>{
 
         const { data } = await authAxios.post(
             `/api/admin/forgot`,
-            {email},
+            { email },
         );
 
         dispatch({ type: FORGOT_PASSWORD_SUCCESS, payload: data });
         return data
 
-    }catch(error){
-        dispatch({type:FORGOT_PASSWORD_FAIL,payload:error.response.data.message})
+    } catch (error) {
+        dispatch({ type: FORGOT_PASSWORD_FAIL, payload: error.response.data.message })
         return error.response.data
-        
+
     }
 }
 
-export const resetPassword=(token,password)=>async (dispatch)=>{
-    try{
-        dispatch({type:RESET_PASSWORD_REQUEST})
+export const resetPassword = (token, password) => async (dispatch) => {
+    try {
+        dispatch({ type: RESET_PASSWORD_REQUEST })
 
         const authAxios = axios.create({
             baseURL: API,
@@ -129,14 +129,14 @@ export const resetPassword=(token,password)=>async (dispatch)=>{
             withCredentials: true
         });
 
-        const {data}=await authAxios.put(`/api/admin/password/reset/${token}`,{password})
-
-        dispatch({type:RESET_PASSWORD_SUCCESS,payload:data})
+        const { data } = await authAxios.put(`/api/admin/password/reset/${token}`, { password })
+        localStorage.setItem("token", data.token)
+        dispatch({ type: RESET_PASSWORD_SUCCESS, payload: data })
         return data
 
 
-    }catch(error){
-        dispatch({type:RESET_PASSWORD_FAIL,payload:error.response.data.message})
+    } catch (error) {
+        dispatch({ type: RESET_PASSWORD_FAIL, payload: error.response.data.message })
         return error.response.data
     }
 }

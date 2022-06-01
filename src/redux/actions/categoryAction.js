@@ -20,10 +20,12 @@ export const getCategories = (userId) => async (dispatch) => {
     try {
         dispatch({ type: GET_CATEGORIES_REQUEST })
 
+        const token = localStorage.getItem("token")
         const authAxios = axios.create({
             baseURL: API,
             headers: {
                 "Content-type": 'application/json',
+                Authorization: `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -40,10 +42,12 @@ export const createCategory = (userId, name) => async (dispatch) => {
     try {
         dispatch({ type: CATEGORY_CREATE_REQUEST })
 
+        const token = localStorage.getItem("token")
         const authAxios = axios.create({
             baseURL: API,
             headers: {
                 "Content-type": 'application/json',
+                Authorization: `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -65,10 +69,12 @@ export const deleteCategory = (categoryId) => async (dispatch) => {
     try {
         dispatch({ type: DELETE_CATEGORY_REQUEST });
 
+        const token = localStorage.getItem("token")
         const authAxios = axios.create({
             baseURL: API,
             headers: {
                 "Content-type": 'application/json',
+                Authorization: `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -89,10 +95,12 @@ export const updateCategory = (userId, category) => async (dispatch) => {
     try {
         dispatch({ type: UPDATE_CATEGORY_REQUEST })
 
+        const token = localStorage.getItem("token")
         const authAxios = axios.create({
             baseURL: API,
             headers: {
                 "Content-type": 'application/json',
+                Authorization: `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -101,12 +109,10 @@ export const updateCategory = (userId, category) => async (dispatch) => {
             `/api/category/update/${userId}/${category._id}`,
             category
         );
-        console.log('datat', data)
         dispatch({ type: UPDATE_CATEGORY_SUCCESS, payload: data });
         return data
 
     } catch (error) {
-        console.log('error', error)
         dispatch({ type: UPDATE_CATEGORY_FAIL, payload: error.response.data.message })
     }
 }

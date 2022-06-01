@@ -16,11 +16,12 @@ import {
 export const createItem = (storeId, newItem) => async (dispatch) => {
     try {
         dispatch({ type: ITEM_CREATE_REQUEST })
-
+        const token = localStorage.getItem("token")
         const authAxios = axios.create({
             baseURL: API,
             headers: {
                 "Content-type": 'application/json',
+                Authorization: `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -41,10 +42,12 @@ export const deleteItem = (itemId) => async (dispatch) => {
 
         dispatch({ type: DELETE_ITEM_REQUEST })
 
+        const token = localStorage.getItem("token")
         const authAxios = axios.create({
             baseURL: API,
             headers: {
                 "Content-type": 'application/json',
+                Authorization: `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -64,10 +67,12 @@ export const updateItem = (userId, itemId) => async (dispatch) => {
     try {
         dispatch({ type: UPDATE_ITEM_REQUEST })
 
+        const token = localStorage.getItem("token")
         const authAxios = axios.create({
             baseURL: API,
             headers: {
                 "Content-type": 'application/json',
+                Authorization: `Bearer ${token}`
             },
             withCredentials: true
         });
