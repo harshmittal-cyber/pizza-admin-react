@@ -7,6 +7,7 @@ import Toaster from '../../utility/Toaster';
 import Modal from '../../utility/Modal';
 import TagsInput from './TagsInput';
 import Resizer from 'react-image-file-resizer'
+import {API} from '../../Backend'
 
 const Menu = () => {
   const dispatch=useDispatch();
@@ -560,7 +561,7 @@ const Menu = () => {
           <tbody>
             {category.items.map((item, index)=>(
             <tr key={index} className="text-heading">
-              <td><img className='shadow' src={`http://localhost:4000${item.image}`}
+              <td><img className='shadow' src={`${API}${item.image}`}
                   style={{objectFit: "cover", objectPosition: "center", borderRadius: "8px", height: "50px", width: "50px"}}
                   alt="" /></td>
               <td>{item.itemName}</td>
