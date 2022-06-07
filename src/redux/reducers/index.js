@@ -4,18 +4,19 @@ import storage from 'redux-persist/lib/storage';
 import { userReducer } from "./userReducer";
 import { categoryReducer } from "./categoryReducer";
 import { RESET } from "../constants/userConstants";
-
+import { orderReducer } from "./orderReducer";
 
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['userReducer', 'categoryReducer']
+    whitelist: ['userReducer', 'categoryReducer', 'orderReducer']
 }
 
 
 const appReducer = combineReducers({
     userReducer,
-    categoryReducer
+    categoryReducer,
+    orderReducer
 })
 const rootReducer = (state, action) => {
     if (action.type === RESET) {
