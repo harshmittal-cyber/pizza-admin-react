@@ -1,14 +1,29 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getOrders, updateOrder } from '../redux/actions/orderAction';
+import moment from 'moment'
 
 const Orders = () => {
+    const { orders, loading } = useSelector((state) => state.orderReducer);
+    const [status, setStatus] = useState('')
+    const dispatch = useDispatch();
 
-    const orders = [
-        { orderId: "v39485nyx392ym98cx328y9", name: "Raghav Khurana", time: "5 min ago", amount: 350, orderStatus: "placed" },
-        { orderId: "v39485nyx392ym98cx328y9", name: "Harsh Mittal", time: "35 min ago", amount: 350, orderStatus: "processing" },
-        { orderId: "v39485nyx392ym98cx328y9", name: "Namit Goel", time: "57 min ago", amount: 350, orderStatus: "processing" },
-        { orderId: "v39485nyx392ym98cx328y9", name: "Raghav Khurana", time: "3 hrs ago", amount: 350, orderStatus: "processing" },
-        { orderId: "v39485nyx392ym98cx328y9", name: "Namit Goel", time: "14.03.22", amount: 350, orderStatus: "processing" },
-    ]
+    useEffect(() => {
+        dispatch(getOrders())
+    }, [])
+
+    const handleStatus = (e) => {
+        setStatus(e.target.value)
+    }
+
+    const handleUpdate = (orderId) => {
+        dispatch(updateOrder(orderId, status)).then((res) => {
+            if (res.success) {
+                setStatus('')
+            }
+        })
+
+    }
 
     return (
         <section className="">
@@ -26,6 +41,7 @@ const Orders = () => {
                                 <th scope="col">Amount</th>
                                 <th scope="col">Order Status</th>
                                 <th scope="col">Actions</th>
+                                <th scope='çol'>Completed</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -33,18 +49,25 @@ const Orders = () => {
                             {orders.map((item, index) => (
                                 <tr key={index} className="text-heading">
                                     <td><p className="text-heading font-semibold text-uppercase">{item.orderId}</p></td>
-                                    <td>{item.name}</td>
-                                    <td>{item.time}</td>
-                                    <td>{item.amount}Rs</td>
+                                    <td>{item.addressId.address.name}</td>
+                                    <td>{moment(item.createdAt).format('h:mm A')}</td>
+                                    <td>Rs {item.orderAmount}</td>
                                     <td>
-                                        <select className='form-select text-capitalize' name="status" id="">
-                                            <option selected={item.orderStatus}>{item.orderStatus}</option>
-                                            <option value="placed">Placed</option>
-                                            <option value="processing">Processing</option>
-                                            <option value="completed">Completed</option>
+                                        <select className='form-select text-capitalize' onChange={handleStatus} >
+                                            <option value={""}>Select Status</option>
+                                            {item.orderStatus.map((status) => (
+                                                !status.isCompleted ?
+                                                    <option name={status.type} value={status.type} selected={status.isCompleted}>{status.type}</option> :
+                                                    null
+                                            ))}
                                         </select>
                                     </td>
-                                    <td><button className='btn btn-sm btn-neutral'>View</button></td>
+                                    <td>
+                                        <button className='btn btn-sm me-3 btn-neutral' disabled={loading} onClick={() => handleUpdate(item._id)}>Update</button>
+                                        <button className='btn btn-sm me-3 btn-neutral'>View</button>
+                                    </td>
+                                    <td><p>{item.orderStatus[3].isCompleted ? <i className='bi bi-check text-success d-flex' style={{ fontSize: "2rem" }}></i> : !item.orderStatus[3].isCompleted && item.orderStatus[4].isCompleted && <i className='bi bi-x text-danger d-flex' style={{ fontSize: "2rem" }}></i>}</p></td>
+
                                 </tr>
                             ))}
                         </tbody>
